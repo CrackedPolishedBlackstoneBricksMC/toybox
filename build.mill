@@ -9,9 +9,7 @@ object Java8 extends ZincWorkerModule {
   override def jvmId = "temurin:8.0-442"
 }
 
-//MavenModule is like JavaModule but defaults the source dir to src/main/java instead of src/.
-//TODO migrate off that.
-trait ToyboxModule extends MavenModule with PublishModule {
+trait ToyboxModule extends JavaModule with PublishModule {
   def gson = ivy"com.google.code.gson:gson:2.11.0"
   def jetbrainsAnnotations = ivy"org.jetbrains:annotations:26.0.2"
   def mappingio = ivy"net.fabricmc:mapping-io:0.7.1" //it can be found on maven central as well
@@ -46,7 +44,7 @@ trait ToyboxModule extends MavenModule with PublishModule {
   }
 
   //for test modules
-  trait ToyboxTests extends MavenTests with TestModule.Junit5 {}
+  trait ToyboxTests extends JavaTests with TestModule.Junit5 {}
 }
 
 /// utils ///
