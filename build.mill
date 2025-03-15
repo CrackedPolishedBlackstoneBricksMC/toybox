@@ -12,12 +12,16 @@ object Java8 extends ZincWorkerModule {
 //MavenModule is like JavaModule but defaults the source dir to src/main/java instead of src/.
 trait ToyboxModule extends MavenModule with PublishModule {
   def gson = ivy"com.google.code.gson:gson:2.11.0"
+  def jetbrainsAnnotations = ivy"org.jetbrains:annotations:26.0.2"
 
   //require each project to set a description
   def desc : String
 
   //toolchain
   override def zincWorker: ModuleRef[ZincWorkerModule] = ModuleRef(Java8)
+
+  //global deps
+  override def compileIvyDeps: T[Agg[Dep]] = Agg(jetbrainsAnnotations)
 
   //publishing
   override def publishVersion = "0.0.1"
@@ -37,7 +41,20 @@ trait ToyboxModule extends MavenModule with PublishModule {
     os.move(super.assembly().path, renamed)
     PathRef(renamed)
   }
+
+  //for test modules
+  trait ToyboxTests extends MavenTests with TestModule.Junit5 {}
 }
+
+/// utils ///
+
+object `toybox-string` extends ToyboxModule {
+  override def desc: String = "Misc string utilities."
+
+  object test extends ToyboxTests {}
+}
+
+/// main products ///
 
 object `toybox-checksum` extends ToyboxModule {
   override def desc: String = "Utilities for working with checksums and hashes."
@@ -49,10 +66,16 @@ object `toybox-gdiff` extends ToyboxModule {
 
 object `toybox-manifest-index` extends ToyboxModule {
   override def desc: String = "Utilities for parsing version_manifest_v2.json from piston-meta."
-  override def ivyDeps = Agg(gson)
+  override def ivyDeps = super.ivyDeps() ++ Agg(gson)
+}
+
+object `toybox-mcp` extends ToyboxModule {
+  override def desc: String = "MCP mappings parser."
+
+  override def moduleDeps: Seq[PublishModule] = Seq(`toybox-string`)
 }
 
 object `toybox-version-manifest` extends ToyboxModule {
   override def desc: String = "Utilities for parsing per-version manifest indices from piston-meta."
-  override def ivyDeps = Agg(gson)
+  override def ivyDeps = super.ivyDeps() ++ Agg(gson)
 }

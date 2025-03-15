@@ -6,6 +6,17 @@ Minecraft tooling a la carte. Use what you need.
 
 Also at the moment, an excuse to try out [mill](https://mill-build.org). Compile with `./mill __.assembly`; arifacts go in `out/<subproject name>/assembly.dest/`.
 
+## TODO
+
+* better MCP api
+  * don't tie the format parsers to their representation
+  * possibly a new module containing definitions for class/field/method/package mappings, and MCP is just a module depending on it?
+  * that way i can reuse those definitions in other mapping formats
+* split off GSON utilities into their own modules (so you can use without GSON or slot in your own json api)
+* more tests lol
+
+There is also fabric mappingio, which [has a cool visitor api](https://github.com/FabricMC/mapping-io/blob/dev/src/main/java/net/fabricmc/mappingio/MappingVisitor.java) and [supports a lot of formats](https://github.com/FabricMC/mapping-io/blob/dev/src/main/java/net/fabricmc/mappingio/format/MappingFormat.java) but is geared towrads modern MCP obviously, so it doesn't support package mappings or fields.csv/methods.csv
+
 ## Tour
 
 ### toybox-checksum
@@ -27,6 +38,14 @@ No dependencies. Compatible with Java 8.
 Parser for Mojang's `version_manifest_v2.json` file on piston-meta.
 
 The `ManifestIndexParser` class needs Google GSON. Compatible with Java 8.
+
+### toybox-mcp
+
+Utilities for MCP format mappings
+
+### toybox-string
+
+Deduplication utilities for strings, used throughout the mapping parsers to reduce memory usage
 
 ### toybox-version-manifest
 
