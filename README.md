@@ -4,7 +4,7 @@ Minecraft tooling a la carte. Use what you need.
 
 **NOTE:** Heavy work in progress. Not tested. Maybe *don't* use it yet.
 
-**NOTE:** The Gradle version catalog is defined in-code inside `settings.gradle`.
+Also at the moment, an excuse to try out [mill](https://mill-build.org). Compile with `./mill __.assembly`; arifacts go in `out/<subproject name>/assembly.dest/`.
 
 ## Tour
 

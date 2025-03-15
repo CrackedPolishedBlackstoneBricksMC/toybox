@@ -1,0 +1,58 @@
+package build
+import mill._
+import mill.define.ModuleRef
+import javalib._
+import publish._
+
+//java 8 toolchain
+object Java8 extends ZincWorkerModule {
+  override def jvmId = "temurin:8.0-442"
+}
+
+//MavenModule is like JavaModule but defaults the source dir to src/main/java instead of src/.
+trait ToyboxModule extends MavenModule with PublishModule {
+  def gson = ivy"com.google.code.gson:gson:2.11.0"
+
+  //require each project to set a description
+  def desc : String
+
+  //toolchain
+  override def zincWorker: ModuleRef[ZincWorkerModule] = ModuleRef(Java8)
+
+  //publishing
+  override def publishVersion = "0.0.1"
+  override def pomSettings: T[PomSettings] = PomSettings (
+    description = desc + " Part of Toybox.",
+    organization = "agency.highlysuspect",
+    url = "https://github.com/CrackedPolishedBlackstoneBricksMC/toybox",
+    licenses = Seq(), //ARR for now
+    versionControl = VersionControl.github("CrackedPolishedBlackstoneBricksMC", "toybox"),
+    developers = Seq(Developer("quat", "quat", "https://highlysuspect.agency")),
+  )
+
+  //rah rah, the default assembly task builds to "out.jar" and can't be changed
+  //but you know what? just subclass it
+  override def assembly: T[PathRef] = Task {
+    val renamed = Task.dest / s"${artifactId()}-${publishVersion()}.jar"
+    os.move(super.assembly().path, renamed)
+    PathRef(renamed)
+  }
+}
+
+object `toybox-checksum` extends ToyboxModule {
+  override def desc: String = "Utilities for working with checksums and hashes."
+}
+
+object `toybox-gdiff` extends ToyboxModule {
+  override def desc: String = "Implementation of the Generic Diff Algorithm used by Minecraft Forge."
+}
+
+object `toybox-manifest-index` extends ToyboxModule {
+  override def desc: String = "Utilities for parsing version_manifest_v2.json from piston-meta."
+  override def ivyDeps = Agg(gson)
+}
+
+object `toybox-version-manifest` extends ToyboxModule {
+  override def desc: String = "Utilities for parsing per-version manifest indices from piston-meta."
+  override def ivyDeps = Agg(gson)
+}
