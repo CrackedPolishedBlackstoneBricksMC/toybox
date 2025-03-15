@@ -14,6 +14,8 @@ Small utilities for working with `MessageFormat` objects and formatting hashes a
 
 No dependencies. Compatible with Java 8.
 
+Might get removed/merged into other stuff, we'll see
+
 ### toybox-gdiff
 
 A simple implementation of the Generic Diff algorithm described by [W3C NOTE-GDIFF](https://www.w3.org/TR/NOTE-gdiff-19970825.html). This format is used by Minecraft Forge binpatches. Does not have the capability to create diffs; only applies them.
@@ -34,10 +36,10 @@ The `VersionManifestParser` class needs Google GSON. Compatible with Java 8.
 
 ## Name
 
-Yes, the name is ripping off [landley/toybox](https://github.com/landley/toybox). I like the name, and later I'd like to provide Minecraft-relevant CLI utilities from this project too, but it's too early for that.
+Yes, the name is ripping off [landley/toybox](https://github.com/landley/toybox).
 
 ## License
 
-Currently unlicensed. This will change shortly.
+Currently unlicensed. This will change.
 
 Code is a mishmash of original stuff, old stuff from Voldeloom that I wrote, and old stuff from Voldeloom that I borrowed from other places like the original Loom. That will need to get sorted out first.
