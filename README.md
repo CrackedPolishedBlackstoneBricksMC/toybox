@@ -4,7 +4,7 @@ Minecraft tooling a la carte. Use what you need.
 
 **NOTE:** Heavy work in progress. Not tested. Maybe *don't* use it yet.
 
-Also at the moment, an excuse to try out [mill](https://mill-build.org). Compile with `./mill __.assembly`; arifacts go in `out/<subproject name>/assembly.dest/`.
+Also an excuse to try out [mill](https://mill-build.org). Compile with `./mill _.assembly`; arifacts go in `out/<subproject name>/assembly.dest/`. Test with `./mill _.test`. Work with a specific module with, say, `./mill toybox-string.test`.
 
 ## TODO
 
@@ -61,4 +61,4 @@ Yes, the name is ripping off [landley/toybox](https://github.com/landley/toybox)
 
 Currently unlicensed. This will change.
 
-Code is a mishmash of original stuff, old stuff from Voldeloom that I wrote, and old stuff from Voldeloom that I borrowed from other places like the original Loom. That will need to get sorted out first.
+Code is a mishmash of original stuff, old stuff from Voldeloom that I wrote, and old stuff from Voldeloom that I borrowed from other places like the original Loom. That will need to get sorted out first, i'll need to include relevant licenses in each jar...

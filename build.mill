@@ -10,9 +10,11 @@ object Java8 extends ZincWorkerModule {
 }
 
 //MavenModule is like JavaModule but defaults the source dir to src/main/java instead of src/.
+//TODO migrate off that.
 trait ToyboxModule extends MavenModule with PublishModule {
   def gson = ivy"com.google.code.gson:gson:2.11.0"
   def jetbrainsAnnotations = ivy"org.jetbrains:annotations:26.0.2"
+  def mappingio = ivy"net.fabricmc:mapping-io:0.7.1" //it can be found on maven central as well
 
   //require each project to set a description
   def desc : String
@@ -25,12 +27,13 @@ trait ToyboxModule extends MavenModule with PublishModule {
 
   //publishing
   override def publishVersion = "0.0.1"
+  private def vc: VersionControl = VersionControl.github("CrackedPolishedBlackstoneBricksMC", "toybox")
   override def pomSettings: T[PomSettings] = PomSettings (
     description = desc + " Part of Toybox.",
     organization = "agency.highlysuspect",
-    url = "https://github.com/CrackedPolishedBlackstoneBricksMC/toybox",
     licenses = Seq(), //ARR for now
-    versionControl = VersionControl.github("CrackedPolishedBlackstoneBricksMC", "toybox"),
+    versionControl = vc,
+    url = vc.browsableRepository.get,
     developers = Seq(Developer("quat", "quat", "https://highlysuspect.agency")),
   )
 
@@ -48,6 +51,10 @@ trait ToyboxModule extends MavenModule with PublishModule {
 
 /// utils ///
 
+object `toybox-checksum` extends ToyboxModule {
+  override def desc: String = "Utilities for working with checksums and hashes."
+}
+
 object `toybox-string` extends ToyboxModule {
   override def desc: String = "Misc string utilities."
 
@@ -56,26 +63,31 @@ object `toybox-string` extends ToyboxModule {
 
 /// main products ///
 
-object `toybox-checksum` extends ToyboxModule {
-  override def desc: String = "Utilities for working with checksums and hashes."
-}
-
 object `toybox-gdiff` extends ToyboxModule {
   override def desc: String = "Implementation of the Generic Diff Algorithm used by Minecraft Forge."
 }
 
 object `toybox-manifest-index` extends ToyboxModule {
   override def desc: String = "Utilities for parsing version_manifest_v2.json from piston-meta."
-  override def ivyDeps = super.ivyDeps() ++ Agg(gson)
+  override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(gson)
 }
 
-object `toybox-mcp` extends ToyboxModule {
-  override def desc: String = "MCP mappings parser."
+object `toybox-mapping` extends ToyboxModule {
+  override def desc: String = "Interchange types for mappings."
+}
 
-  override def moduleDeps: Seq[PublishModule] = Seq(`toybox-string`)
+object `toybox-mapping-mappingio` extends ToyboxModule {
+  override def desc: String = "toybox-mapping interop with FabricMC Mapping-IO."
+  override def moduleDeps: Seq[PublishModule] = Seq(`toybox-mapping`)
+  override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(mappingio)
+}
+
+object `toybox-mapping-mcp` extends ToyboxModule {
+  override def desc: String = "toybox-mapping utilities for (old) MCP mapping formats."
+  override def moduleDeps: Seq[PublishModule] = Seq(`toybox-mapping`, `toybox-string`)
 }
 
 object `toybox-version-manifest` extends ToyboxModule {
   override def desc: String = "Utilities for parsing per-version manifest indices from piston-meta."
-  override def ivyDeps = super.ivyDeps() ++ Agg(gson)
+  override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(gson)
 }

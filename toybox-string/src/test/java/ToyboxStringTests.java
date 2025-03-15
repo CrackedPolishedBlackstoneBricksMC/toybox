@@ -89,10 +89,12 @@ public class ToyboxStringTests {
 	}
 	
 	@Test
-	public void dummyDoesntWork() {
-		StringInterner dummy = DummyStringInterner.INSTANCE;
-		String a = dummy.intern("hello");
-		String b = dummy.intern(not("hello"));
-		assertNotSame(a, b);
+	public void dummyFailsBasic() {
+		assertThrows(Throwable.class, () -> basic(DummyStringInterner.INSTANCE));
+	}
+	
+	@Test
+	public void dummyFailsProp() {
+		assertThrows(Throwable.class, () -> prop(DummyStringInterner.INSTANCE));
 	}
 }
