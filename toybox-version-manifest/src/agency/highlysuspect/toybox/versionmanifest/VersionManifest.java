@@ -1,6 +1,6 @@
 package agency.highlysuspect.toybox.versionmanifest;
 
-import com.google.gson.annotations.SerializedName;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.List;
@@ -50,8 +50,7 @@ public class VersionManifest {
 		
 		//Used by forge 1.6/1.7 internal version.json
 		//Not vanilla
-		@SerializedName("url")
-		public String forgeDownloadRoot;
+		public @Nullable String url;
 	}
 	
 	public static class LibraryDownloads {

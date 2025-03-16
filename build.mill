@@ -10,7 +10,7 @@ object Java8 extends ZincWorkerModule {
 }
 
 trait ToyboxModule extends JavaModule with PublishModule {
-  def gson = ivy"com.google.code.gson:gson:2.11.0"
+  def googleGson = ivy"com.google.code.gson:gson:2.11.0"
   def jetbrainsAnnotations = ivy"org.jetbrains:annotations:26.0.2"
   def mappingio = ivy"net.fabricmc:mapping-io:0.7.1" //it can be found on maven central as well
 
@@ -35,16 +35,30 @@ trait ToyboxModule extends JavaModule with PublishModule {
     developers = Seq(Developer("quat", "quat", "https://highlysuspect.agency")),
   )
 
-  //rah rah, the default assembly task builds to "out.jar" and can't be changed
-  //but you know what? just subclass it
+  def baseName: T[String] = s"${artifactId()}-${publishVersion()}.jar"
+
+  //rah rah, the default jar and assembly tasks build to "out.jar"
+  //and it can't be changed. but you know what? just subclass it
+  //surely this will not bite me in the ass later
   override def assembly: T[PathRef] = Task {
-    val renamed = Task.dest / s"${artifactId()}-${publishVersion()}.jar"
+    val renamed = Task.dest / baseName()
     os.move(super.assembly().path, renamed)
+    PathRef(renamed)
+  }
+
+  override def jar: T[PathRef] = Task {
+    val renamed = Task.dest / baseName()
+    os.move(super.jar().path, renamed)
     PathRef(renamed)
   }
 
   //for test modules
   trait ToyboxTests extends JavaTests with TestModule.Junit5 {}
+}
+
+trait WithGsonModule extends ToyboxModule {
+  override def desc: String = "Utilities for connecting Google GSON to this module."
+  override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(googleGson)
 }
 
 /// utils ///
@@ -55,7 +69,12 @@ object `toybox-checksum` extends ToyboxModule {
 
 object `toybox-string` extends ToyboxModule {
   override def desc: String = "Misc string utilities."
+  object test extends ToyboxTests {}
+}
 
+object `toybox-gson` extends ToyboxModule {
+  override def desc: String = "General utilities for working with GSON on Toybox types."
+  override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(googleGson)
   object test extends ToyboxTests {}
 }
 
@@ -67,7 +86,11 @@ object `toybox-gdiff` extends ToyboxModule {
 
 object `toybox-manifest-index` extends ToyboxModule {
   override def desc: String = "Utilities for parsing version_manifest_v2.json from piston-meta."
-  override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(gson)
+  override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(googleGson)
+
+  object gson extends WithGsonModule {
+    override def moduleDeps: Seq[PublishModule] = Seq(`toybox-gson`, `toybox-manifest-index`)
+  }
 }
 
 object `toybox-mapping` extends ToyboxModule {
@@ -87,5 +110,9 @@ object `toybox-mapping-mcp` extends ToyboxModule {
 
 object `toybox-version-manifest` extends ToyboxModule {
   override def desc: String = "Utilities for parsing per-version manifest indices from piston-meta."
-  override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(gson)
+  override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(googleGson)
+
+  object gson extends WithGsonModule {
+    override def moduleDeps: Seq[PublishModule] = Seq(`toybox-gson`, `toybox-version-manifest`)
+  }
 }

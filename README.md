@@ -4,7 +4,11 @@ Minecraft tooling a la carte. Use what you need.
 
 **NOTE:** Heavy work in progress. Not tested. Maybe *don't* use it yet.
 
-Also an excuse to try out [mill](https://mill-build.org). Compile with `./mill _.assembly`; arifacts go in `out/<subproject name>/assembly.dest/`. Test with `./mill _.test`. Work with a specific module with, say, `./mill toybox-string.test`.
+Also an excuse to try out [mill](https://mill-build.org).
+
+* Test with `./mill __.test`. Work with a specific module with, say, `./mill toybox-string.test`.
+* Create jars with `./mill __.jar`. They go in `out/<module name>/jar.dest/`.
+* Create fatjars with `./mill __.assembly`; artifacts go in `out/<subproject name>/assembly.dest/`.
 
 ## TODO
 
@@ -12,7 +16,6 @@ Also an excuse to try out [mill](https://mill-build.org). Compile with `./mill _
   * don't tie the format parsers to their representation
   * possibly a new module containing definitions for class/field/method/package mappings, and MCP is just a module depending on it?
   * that way i can reuse those definitions in other mapping formats
-* split off GSON utilities into their own modules (so you can use without GSON or slot in your own json api)
 * more tests lol
 
 There is also fabric mappingio, which [has a cool visitor api](https://github.com/FabricMC/mapping-io/blob/dev/src/main/java/net/fabricmc/mappingio/MappingVisitor.java) and [supports a lot of formats](https://github.com/FabricMC/mapping-io/blob/dev/src/main/java/net/fabricmc/mappingio/format/MappingFormat.java) but is geared towrads modern MCP obviously, so it doesn't support package mappings or fields.csv/methods.csv

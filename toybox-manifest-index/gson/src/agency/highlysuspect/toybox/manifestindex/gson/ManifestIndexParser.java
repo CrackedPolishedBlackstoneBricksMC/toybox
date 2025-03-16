@@ -1,5 +1,7 @@
-package agency.highlysuspect.toybox.manifestindex;
+package agency.highlysuspect.toybox.manifestindex.gson;
 
+import agency.highlysuspect.toybox.gson.ToyboxGson;
+import agency.highlysuspect.toybox.manifestindex.ManifestIndex;
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
@@ -13,9 +15,7 @@ import java.time.Instant;
 
 public class ManifestIndexParser {
 	public ManifestIndexParser() {
-		this.gson = new GsonBuilder()
-			.registerTypeAdapter(Instant.class, new InstantSerde())
-			.create();
+		this.gson = ToyboxGson.builder().create();
 	}
 	
 	protected Gson gson;

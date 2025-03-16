@@ -31,44 +31,12 @@ public class ManifestIndex {
 	
 	public static String PISTON_META_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
 	
-	protected transient Map<String, VersionData> versionMap = null;
-	
-	public ManifestIndex useVersionMapCache() {
-		if(versionMap == null) {
-			Map<String, VersionData> map = new LinkedHashMap<>();
-			for(VersionData vd : this.versions) map.put(vd.id, vd);
-			versionMap = map;
-		}
-		
-		return this;
+	public VersionData getLinearSearch(String ver) {
+		for(VersionData vd : this.versions) if(vd.id.equals(ver)) return vd;
+		return null;
 	}
 	
-	public ManifestIndex dropVersionMapCache() {
-		versionMap = null;
-		return this;
-	}
-	
-	public Map<String, VersionData> getOrCreateVersionMapCache() {
-		useVersionMapCache();
-		return versionMap;
-	}
-	
-	public VersionData get(String ver) {
-		if(versionMap == null) {
-			//Linear search
-			for(VersionData vd : this.versions) if(vd.id.equals(ver)) return vd;
-			return null;
-		} else {
-			//Map lookup
-			return versionMap.get(ver);
-		}
-	}
-	
-	public VersionData getLatestRelease() {
-		return get(latest.release);
-	}
-	
-	public VersionData getLatestSnapshot() {
-		return get(latest.snapshot);
+	public ManifestIndexMap toMap() {
+		return new ManifestIndexMap(this);
 	}
 }

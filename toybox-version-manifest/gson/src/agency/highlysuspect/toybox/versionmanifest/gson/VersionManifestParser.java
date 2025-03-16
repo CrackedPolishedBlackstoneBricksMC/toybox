@@ -1,7 +1,8 @@
-package agency.highlysuspect.toybox.versionmanifest;
+package agency.highlysuspect.toybox.versionmanifest.gson;
 
+import agency.highlysuspect.toybox.gson.ToyboxGson;
+import agency.highlysuspect.toybox.versionmanifest.VersionManifest;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 
 import java.io.BufferedReader;
@@ -9,13 +10,10 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Instant;
 
 public class VersionManifestParser {
 	public VersionManifestParser() {
-		this.gson = new GsonBuilder()
-			.registerTypeAdapter(Instant.class, new InstantSerde())
-			.create();
+		this.gson = ToyboxGson.builder().create();
 	}
 	
 	protected Gson gson;
