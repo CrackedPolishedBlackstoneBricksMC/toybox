@@ -75,7 +75,9 @@ object `toybox-string` extends ToyboxModule {
 object `toybox-gson` extends ToyboxModule {
   override def desc: String = "General utilities for working with GSON on Toybox types."
   override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(googleGson)
-  object test extends ToyboxTests {}
+  object test extends ToyboxTests {
+    override def moduleDeps: Seq[JavaModule] = Seq(`toybox-gson`);
+  }
 }
 
 /// main products ///
@@ -87,9 +89,13 @@ object `toybox-gdiff` extends ToyboxModule {
 object `toybox-manifest-index` extends ToyboxModule {
   override def desc: String = "Utilities for parsing version_manifest_v2.json from piston-meta."
   override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(googleGson)
+  object test extends ToyboxTests {}
 
   object gson extends WithGsonModule {
     override def moduleDeps: Seq[PublishModule] = Seq(`toybox-gson`, `toybox-manifest-index`)
+    object test extends ToyboxTests {
+      override def moduleDeps: Seq[JavaModule] = Seq(`toybox-manifest-index`.gson, `toybox-manifest-index`.test)
+    }
   }
 }
 

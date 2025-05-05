@@ -38,9 +38,9 @@ No dependencies. Compatible with Java 8.
 
 ### toybox-manifest-index
 
-Parser for Mojang's `version_manifest_v2.json` file on piston-meta.
+Representation of Mojang's `version_manifest_v2.json` file on piston-meta.
 
-The `ManifestIndexParser` class needs Google GSON. Compatible with Java 8.
+The GSON subproject contains a parser using Google GSON. Compatible with Java 8.
 
 ### toybox-mcp
 
@@ -54,7 +54,7 @@ Deduplication utilities for strings, used throughout the mapping parsers to redu
 
 Parser for per-version manifests like `1.20.1.json` on piston-meta.
 
-The `VersionManifestParser` class needs Google GSON. Compatible with Java 8.
+The `gson` subproject contains a parser using Google GSON. Compatible with Java 8.
 
 ## Name
 

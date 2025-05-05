@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 
 public class ManifestIndexMap extends LinkedHashMap<String, ManifestIndex.VersionData> {
 	public ManifestIndexMap(ManifestIndex index) {
-		super((int) (index.versions.size() * 1.5)); //load-factor bullshit
+		super((int) (index.versions.size() * 1.5)); //load-factor bullshit TODO test lol
 		
 		for(ManifestIndex.VersionData vd : index.versions) put(vd.id, vd);
 		this.latest = index.latest;
