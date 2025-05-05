@@ -4,6 +4,7 @@ import agency.highlysuspect.toybox.string.MapStringInterner;
 import agency.highlysuspect.toybox.string.StringInterner;
 import org.junit.jupiter.api.Test;
 
+import java.util.IdentityHashMap;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -66,6 +67,14 @@ public class ToyboxStringTests {
 		}
 		assertTrue(foundTrue, "didn't find equal strings in array");
 		assertTrue(foundFalse, "didn't find non-equal strings in array");
+		
+		//the number of unique objects in the array went down
+		IdentityHashMap<String, Void> origMap = new IdentityHashMap<>();
+		for(String s : orig) origMap.put(s, null);
+		IdentityHashMap<String, Void> dedupMap = new IdentityHashMap<>();
+		for(String s : deduped) dedupMap.put(s, null);
+		assertEquals(len, origMap.size());
+		assertTrue(dedupMap.size() < len);
 	}
 	
 	@Test
