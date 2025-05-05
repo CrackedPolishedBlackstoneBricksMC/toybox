@@ -41,71 +41,40 @@ public class GsonManifestIndexParser implements ManifestIndexParser {
 	}
 	
 	@Override
-	public ManifestIndex.VersionData parseOneVersion(Reader dataReader, String wantedVersion) throws IOException {
+	public ManifestIndex.VersionData parseVersion(Reader dataReader, String wantedVersion) throws IOException {
 		try(JsonReader reader = new JsonReader(dataReader)) {
 			reader.beginObject();
-			goToVersionsArray(reader);
+			goTo(reader, "versions");
 			return scanVersionsArray(reader, wantedVersion);
 		}
 	}
 	
 	@Override
-	public ManifestIndex.VersionData parseLatestRelease(Reader reader) throws IOException {
-		return parseNamedRelease(reader, "release");
-	}
-	
-	@Override
-	public ManifestIndex.VersionData parseLatestSnapshot(Reader reader) throws IOException {
-		return parseNamedRelease(reader, "snapshot");
-	}
-	
-	protected ManifestIndex.VersionData parseNamedRelease(Reader dataReader, String name) throws IOException {
+	public ManifestIndex.Latest parseLatestVersions(Reader dataReader) throws IOException {
 		try(JsonReader reader = new JsonReader(dataReader)) {
 			reader.beginObject();
+			goTo(reader, "latest");
+			reader.beginObject();
 			
-			//find the "latest": { ... } block
-			boolean foundIt = false;
-			found: while(reader.peek() != JsonToken.END_OBJECT) {
+			ManifestIndex.Latest latest = new ManifestIndex.Latest();
+			while(reader.peek() != JsonToken.END_OBJECT) {
 				switch(reader.nextName()) {
-					case "latest":
-						foundIt = true;
-						break found;
-					case "versions":
-						//ok, this is impossible to parse incrementally, we don't know what version we're looking for
-						//TODO: fall back to non-incremental parsing?
-						throw new UnsupportedOperationException("'versions' block came before 'latest'; can't incrementally parse");
-					default:
-						reader.skipValue();
+					case "release": latest.release = reader.nextString(); break;
+					case "snapshot": latest.snapshot = reader.nextString(); break;
+					default: reader.skipValue();
 				}
 			}
 			
-			if(!foundIt)
-				throw new IllegalArgumentException("no 'latest' block");
-			
-			//find the wanted version
-			String wantedVersion = null;
-			reader.beginObject();
-			while(reader.peek() != JsonToken.END_OBJECT) {
-				if(name.equals(reader.nextName())) wantedVersion = reader.nextString();
-				else reader.skipValue();
-			}
-			reader.endObject();
-			if(wantedVersion == null)
-				throw new IllegalArgumentException("'latest' block didn't include '" + name + "'");
-			
-			//ok, we know what version we're looking for, and we definitely haven't seen 'versions' yet
-			//therefore goToVersionsArray will succeed and this will work. yay
-			goToVersionsArray(reader);
-			return scanVersionsArray(reader, wantedVersion);
+			return latest;
 		}
 	}
 	
-	protected void goToVersionsArray(JsonReader reader) throws IOException {
+	protected void goTo(JsonReader reader, String key) throws IOException {
 		while(reader.peek() != JsonToken.END_OBJECT) {
-			if(reader.nextName().equals("versions")) return; //found it
+			if(reader.nextName().equals(key)) return; //found it
 			reader.skipValue();
 		}
-		throw new IllegalArgumentException("couldn't find 'versions' key");
+		throw new IllegalArgumentException("couldn't find '" + key + "' key");
 	}
 	
 	protected ManifestIndex.VersionData scanVersionsArray(JsonReader reader, String wantedVersion) throws IOException {

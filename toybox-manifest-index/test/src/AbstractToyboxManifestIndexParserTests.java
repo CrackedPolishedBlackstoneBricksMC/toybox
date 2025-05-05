@@ -74,26 +74,22 @@ public abstract class AbstractToyboxManifestIndexParserTests {
 	@Test
 	public void incrementalParser() throws Exception {
 		//ground truth
-		ManifestIndexMap map;
+		ManifestIndex index;
 		try(InputStreamReader isn = new InputStreamReader(vmv2In())) {
-			map = getParser().parseEntireIndex(isn).toMap();
+			index = getParser().parseEntireIndex(isn);
 		}
 		
 		//parsing a specific version
 		try(InputStreamReader isn = new InputStreamReader(vmv2In())) {
-			ManifestIndex.VersionData vdInc = getParser().parseOneVersion(isn, "1.12.2");
-			assertEquals(map.get("1.12.2"), vdInc);
+			ManifestIndex.VersionData vdInc = getParser().parseVersion(isn, "1.12.2");
+			assertEquals(index.getLinearSearch("1.12.2"), vdInc);
 			assertIsOneTwelveTwo(vdInc);
 		}
 		
-		//parsing latest release and snap
+		//parsing latest releases
 		try(InputStreamReader isn = new InputStreamReader(vmv2In())) {
-			ManifestIndex.VersionData latestRelease = getParser().parseLatestRelease(isn);
-			assertEquals(map.getLatestRelease(), latestRelease);
-		}
-		try(InputStreamReader isn = new InputStreamReader(vmv2In())) {
-			ManifestIndex.VersionData latestSnap = getParser().parseLatestSnapshot(isn);
-			assertEquals(map.getLatestSnapshot(), latestSnap);
+			ManifestIndex.Latest latest = getParser().parseLatestVersions(isn);
+			assertEquals(index.latest, latest);
 		}
 	}
 	

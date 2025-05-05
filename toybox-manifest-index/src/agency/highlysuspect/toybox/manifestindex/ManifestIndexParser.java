@@ -23,21 +23,15 @@ public interface ManifestIndexParser {
 		return parseEntireIndex(bob.toString());
 	}
 	
-	//these default to parsing the whole index and picking out one version
-	//but subclasses can use incremental/streaming parsers to nudge performance a bit
-	//only use these when you really do only want one version!
+	//these default to parsing the whole index and picking out one version,
+	//but subclasses can use incremental/streaming parsers to nudge performance a bit.
+	//only use when you really do only want one version!
 	
-	default ManifestIndex.VersionData parseOneVersion(Reader reader, String wantedVersion) throws IOException {
+	default ManifestIndex.Latest parseLatestVersions(Reader reader) throws IOException {
+		return parseEntireIndex(reader).latest;
+	}
+	
+	default ManifestIndex.VersionData parseVersion(Reader reader, String wantedVersion) throws IOException {
 		return parseEntireIndex(reader).getLinearSearch(wantedVersion);
-	}
-	
-	default ManifestIndex.VersionData parseLatestRelease(Reader reader) throws IOException {
-		ManifestIndex mi = parseEntireIndex(reader);
-		return mi.getLinearSearch(mi.latest.release);
-	}
-	
-	default ManifestIndex.VersionData parseLatestSnapshot(Reader reader) throws IOException {
-		ManifestIndex mi = parseEntireIndex(reader);
-		return mi.getLinearSearch(mi.latest.snapshot);
 	}
 }
