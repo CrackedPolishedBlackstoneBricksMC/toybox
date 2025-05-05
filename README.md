@@ -20,6 +20,8 @@ Also an excuse to try out [mill](https://mill-build.org).
 
 There is also fabric mappingio, which [has a cool visitor api](https://github.com/FabricMC/mapping-io/blob/dev/src/main/java/net/fabricmc/mappingio/MappingVisitor.java) and [supports a lot of formats](https://github.com/FabricMC/mapping-io/blob/dev/src/main/java/net/fabricmc/mappingio/format/MappingFormat.java) but is geared towrads modern MCP obviously, so it doesn't support package mappings or fields.csv/methods.csv
 
+Repackaging transformations *feel* like class-remapping, but they're slightly different. For example we need to express "move *all* classes without a package into this package", [e.g.](https://github.com/CrackedPolishedBlackstoneBricksMC/voldeloom/issues/14).
+
 ## Tour
 
 ### toybox-checksum

@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
+//TODO kinda mcp-ish
 public class MapRepackager implements Repackager {
 	public MapRepackager(Map<String, String> packages) {
 		this.packages = packages;
@@ -12,7 +13,7 @@ public class MapRepackager implements Repackager {
 	
 	//keys: the original class name w/ its package stripped off
 	//values: the target package, not including the class name or trailing slash
-	//ex. "Block" -> "net/minecraft/block"
+	//ex. "BlockFire -> net/minecraft/block" means "move BlockFire to net/minecraft/block/BlockFire"
 	protected Map<String, String> packages;
 	
 	@Override
