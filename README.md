@@ -24,6 +24,10 @@ Repackaging transformations *feel* like class-remapping, but they're slightly di
 
 ## Tour
 
+### northstar
+
+Sandboxing. (This is intended to be a Mill library after all.)
+
 ### toybox-checksum
 
 Small utilities for working with `MessageFormat` objects and formatting hashes as hex strings.
