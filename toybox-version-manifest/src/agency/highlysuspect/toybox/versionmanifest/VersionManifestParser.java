@@ -1,7 +1,6 @@
-package agency.highlysuspect.toybox.versionmanifest.gson;
+package agency.highlysuspect.toybox.versionmanifest;
 
 import agency.highlysuspect.toybox.gson.ToyboxGson;
-import agency.highlysuspect.toybox.versionmanifest.VersionManifest;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 

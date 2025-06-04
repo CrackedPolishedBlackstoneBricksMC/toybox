@@ -1,5 +1,5 @@
 import agency.highlysuspect.toybox.manifestindex.ManifestIndexParser;
-import agency.highlysuspect.toybox.manifestindex.gson.GsonManifestIndexParser;
+import agency.highlysuspect.toybox.manifestindex.GsonManifestIndexParser;
 
 public class ToyboxGsonManifestIndexParserTests extends AbstractToyboxManifestIndexParserTests {
 	@Override

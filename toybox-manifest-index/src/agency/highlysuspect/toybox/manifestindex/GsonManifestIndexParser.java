@@ -1,8 +1,6 @@
-package agency.highlysuspect.toybox.manifestindex.gson;
+package agency.highlysuspect.toybox.manifestindex;
 
 import agency.highlysuspect.toybox.gson.ToyboxGson;
-import agency.highlysuspect.toybox.manifestindex.ManifestIndex;
-import agency.highlysuspect.toybox.manifestindex.ManifestIndexParser;
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;

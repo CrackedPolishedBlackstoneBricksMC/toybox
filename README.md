@@ -32,21 +32,15 @@ Sandboxing. (This is intended to be a Mill library after all.)
 
 Small utilities for working with `MessageFormat` objects and formatting hashes as hex strings.
 
-No dependencies. Compatible with Java 8.
-
 Might get removed/merged into other stuff, we'll see
 
 ### toybox-gdiff
 
 A simple implementation of the Generic Diff algorithm described by [W3C NOTE-GDIFF](https://www.w3.org/TR/NOTE-gdiff-19970825.html). This format is used by Minecraft Forge binpatches. Does not have the capability to create diffs; only applies them.
 
-No dependencies. Compatible with Java 8.
-
 ### toybox-manifest-index
 
 Representation of Mojang's `version_manifest_v2.json` file on piston-meta.
-
-The GSON subproject contains a parser using Google GSON. Compatible with Java 8.
 
 ### toybox-mcp
 
@@ -59,8 +53,6 @@ Deduplication utilities for strings, used throughout the mapping parsers to redu
 ### toybox-version-manifest
 
 Parser for per-version manifests like `1.20.1.json` on piston-meta.
-
-The `gson` subproject contains a parser using Google GSON. Compatible with Java 8.
 
 ## Name
 

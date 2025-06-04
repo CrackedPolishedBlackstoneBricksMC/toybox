@@ -1,23 +1,29 @@
+//| mill-version: 1.0.0-RC1-jvm
+
 package build
-import mill._
-import mill.define.ModuleRef
-import mill.main.BuildInfo.millVersion
-import javalib._
-import mill.scalalib.WithZincWorker
-import publish._
+import mill.*, javalib.*, publish.*
+import mill.define.*
+import mill.scalalib.WithJvmWorker
+import mill.util.BuildInfo.{millVersion, millBinPlatform}
 
-//java 8 toolchain
-object Java8 extends ZincWorkerModule {
-  override def jvmId = "temurin:8.0-442"
-}
+//n.b. this buildscript is not very idiomatic mill
+//mill permits omitting `override` and type definitions, for example
+//but i like them :)
 
-trait ToyboxBaseModule extends PublishModule with WithZincWorker {
-  def googleGson = ivy"com.google.code.gson:gson:2.11.0"
-  def jetbrainsAnnotations = ivy"org.jetbrains:annotations:26.0.2"
-  def mappingio = ivy"net.fabricmc:mapping-io:0.7.1" //it can be found on maven central as well
+def theScalaVersion = "3.7.0"
+
+//java 8 toolchain (TODO: bring it back? maybe we can leave java 8 in the dust)
+//object Java8 extends JvmWorkerModule {
+//  override def jvmId = "temurin:8.0-442"
+//}
+
+trait ToyboxBaseModule extends PublishModule with WithJvmWorker {
+  def googleGson = mvn"com.google.code.gson:gson:2.11.0"
+  def jetbrainsAnnotations = mvn"org.jetbrains:annotations:26.0.2"
+  def mappingio = mvn"net.fabricmc:mapping-io:0.7.1" //it can be found on maven central as well
 
   //toolchain
-  override def zincWorker: ModuleRef[ZincWorkerModule] = ModuleRef(Java8)
+//  override def jvmWorker: ModuleRef[JvmWorkerModule] = ModuleRef(Java8)
 
   //require each project to set a description
   def desc : String
@@ -37,29 +43,18 @@ trait ToyboxBaseModule extends PublishModule with WithZincWorker {
 
 trait ToyboxModule extends JavaModule with ToyboxBaseModule { outer =>
   //global deps
-  override def compileIvyDeps: T[Agg[Dep]] = Agg(jetbrainsAnnotations)
+  override def compileMvnDeps: T[Seq[Dep]] = Seq(jetbrainsAnnotations)
 
   //for test modules
   trait ToyboxTests extends JavaTests with TestModule.Junit5 {}
-
-  trait WithGsonModule extends ToyboxModule {
-    override def desc: String = s"Utilities for connecting Google GSON to ${outer.artifactName}."
-    override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(googleGson)
-    //automagically include toybox-gson and the enclosing module
-    //"outer" isn't magic, it's some kind of implicit argument thing defined up there (scala is weird!)
-    override def moduleDeps: Seq[PublishModule] = super.moduleDeps ++ Seq(`toybox-gson`, outer)
-  }
 
   //iunno what im doing https://mill-build.org/mill/extending/writing-plugins.html
   trait WithMillModule extends scalalib.ScalaModule with ToyboxBaseModule {
     override def desc: String = s"Utilities for using ${outer.artifactName} with the Mill build system."
 
-    def scalaVersion = "2.13.15"
-
-    //Set the `platformSuffix` so the name indicates what Mill version it is compiled for
-    override def platformSuffix: T[String] = "_mill" + mill.main.BuildInfo.millBinPlatform
-
-    override def ivyDeps = Agg(ivy"com.lihaoyi:mill-dist:$millVersion") //compile against current mill version
+    override def scalaVersion = theScalaVersion
+    override def platformSuffix: T[String] = s"_mill$millBinPlatform"
+    override def mvnDeps = Seq(mvn"com.lihaoyi::mill-libs:$millVersion")
 
     override def moduleDeps: Seq[PublishModule] = super.moduleDeps ++ Seq(outer)
   }
@@ -78,7 +73,7 @@ object `toybox-string` extends ToyboxModule {
 
 object `toybox-gson` extends ToyboxModule {
   override def desc: String = "General utilities for working with GSON on Toybox types."
-  override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(googleGson)
+  override def mvnDeps: T[Seq[Dep]] = super.mvnDeps() ++ Seq(googleGson)
   object test extends ToyboxTests {}
 }
 
@@ -90,19 +85,10 @@ object `toybox-gdiff` extends ToyboxModule {
 
 object `toybox-manifest-index` extends ToyboxModule {
   override def desc: String = "Utilities for parsing version_manifest_v2.json from piston-meta."
-  override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(googleGson)
+  override def moduleDeps: Seq[PublishModule] = super.moduleDeps ++ Seq(`toybox-gson`)
   object test extends ToyboxTests {}
 
-  object gson extends WithGsonModule {
-    object test extends ToyboxTests {
-      //reach across and include the test classes from toybox-manifest-index.test as well
-      override def moduleDeps: Seq[JavaModule] = super.moduleDeps ++ Seq(`toybox-manifest-index`.test)
-    }
-  }
-
-  object mill extends WithMillModule {
-    override def moduleDeps: Seq[PublishModule] = super.moduleDeps ++ Seq(gson)
-  }
+  object mill extends WithMillModule {}
 }
 
 object `toybox-mapping` extends ToyboxModule {
@@ -112,7 +98,7 @@ object `toybox-mapping` extends ToyboxModule {
 object `toybox-mapping-mappingio` extends ToyboxModule {
   override def desc: String = "toybox-mapping interop with FabricMC Mapping-IO."
   override def moduleDeps: Seq[PublishModule] = super.moduleDeps ++ Seq(`toybox-mapping`)
-  override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(mappingio)
+  override def mvnDeps: T[Seq[Dep]] = super.mvnDeps() ++ Seq(mappingio)
 }
 
 object `toybox-mapping-mcp` extends ToyboxModule {
@@ -122,40 +108,34 @@ object `toybox-mapping-mcp` extends ToyboxModule {
 
 object `toybox-version-manifest` extends ToyboxModule {
   override def desc: String = "Utilities for parsing per-version manifest indices from piston-meta."
-  override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(googleGson)
-
-  object gson extends WithGsonModule {
-  }
+  override def moduleDeps: Seq[PublishModule] = super.moduleDeps ++ Seq(`toybox-gson`)
 }
 
 /// northstar ///
 
 object northstar extends scalalib.ScalaModule {
-  def scalaVersion = "2.13.15"
-
-  //Set the `platformSuffix` so the name indicates what Mill version it is compiled for
-  override def platformSuffix: T[String] = "_mill" + mill.main.BuildInfo.millBinPlatform
-
-  override def ivyDeps = Agg(ivy"com.lihaoyi:mill-dist:$millVersion") //compile against current mill version
+  override def scalaVersion = theScalaVersion
+  override def platformSuffix: T[String] = s"_mill$millBinPlatform"
+  override def mvnDeps = Seq(mvn"com.lihaoyi::mill-libs:$millVersion")
 
   override def moduleDeps = super.moduleDeps ++ Seq(
-    `toybox-manifest-index`.gson
+    `toybox-manifest-index`
   )
 
   object test extends ScalaTests with TestModule.Utest {
-    override def ivyDeps = Agg(ivy"com.lihaoyi::mill-testkit:$millVersion")
-    //override def forkEnv = Map("MILL_EXECUTABLE_PATH" -> millExecutable.assembly().path.toString)
+    override def mvnDeps = Seq(mvn"com.lihaoyi::mill-testkit:$millVersion")
+    override def forkEnv = Task {
+      val localClasspathString = northstar.localClasspath().map(_.path).mkString("\n")
+      Map(
+        "MILL_EXECUTABLE_PATH" -> millExecutable.assembly().path.toString,
+        //TODO i dont think this works
+        "MILL_LOCAL_TEST_OVERRIDE_northstar" -> localClasspathString
+      )
+    }
 
     object millExecutable extends JavaModule {
-      override def ivyDeps = Agg(ivy"com.lihaoyi:mill-dist:$millVersion")
-
-      override def mainClass = Some("mill.runner.client.MillClientMain")
-
-      override def resources = Task {
-        val p = Task.dest / "mill/local-test-overrides" / s"com.lihaoyi-${northstar.artifactId()}"
-        os.write(p, northstar.localClasspath().map(_.path).mkString("\n"), createFolders = true)
-        Seq(PathRef(Task.dest))
-      }
+      override def mvnDeps = Seq(mvn"com.lihaoyi:mill-runner-launcher_3:$millVersion")
+      override def mainClass = Some("mill.launcher.MillLauncherMain")
     }
   }
 }
