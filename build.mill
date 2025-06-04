@@ -80,6 +80,7 @@ object `toybox-checksum` extends ToyboxModule {
 object `toybox-download` extends ToyboxModule {
   override def desc: String = "Utilities for downloading files from the internet."
   object test extends ToyboxTests {}
+  object mill extends WithMillModule {}
 }
 
 object `toybox-string` extends ToyboxModule {
@@ -135,7 +136,7 @@ object northstar extends scalalib.ScalaModule {
   override def mvnDeps = Seq(mvn"com.lihaoyi::mill-libs:$millVersion")
 
   override def moduleDeps = super.moduleDeps ++ Seq(
-    `toybox-manifest-index`, `toybox-download`
+    `toybox-manifest-index`, `toybox-download`.mill
   )
 
   object test extends ScalaTests with TestModule.Utest {
