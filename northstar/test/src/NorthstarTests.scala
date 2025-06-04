@@ -1,3 +1,4 @@
+import agency.highlysuspect.toybox.download.*
 import agency.highlysuspect.toybox.manifestindex.ManifestIndex
 import agency.highlysuspect.toybox.manifestindex.GsonManifestIndexParser
 import mill.*
@@ -17,7 +18,12 @@ object NorthstarTests extends TestSuite {
         def fetchManifest = Task[PathRef] {
           val d = Task.dest / "version_manifest_v2.json"
           println("downloading to " ++ d.toString())
-          os.write(d, requests.get.stream(ManifestIndex.PISTON_META_URL))
+
+          val spec: DownloadSpec = new DownloadSpec(ManifestIndex.PISTON_META_URL)
+          val dest: PathDownloadDest = new PathDownloadDest(d.toNIO)
+          val backend: DownloadBackend = new HttpURLConnectionBackend()
+          backend.newDownloader(spec, dest).download()
+
           PathRef(d)
         }
 

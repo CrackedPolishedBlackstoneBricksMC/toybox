@@ -2,7 +2,6 @@
 
 package build
 import mill.*, javalib.*, publish.*
-import mill.define.*
 import mill.scalalib.WithJvmWorker
 import mill.util.BuildInfo.{millVersion, millBinPlatform}
 
@@ -15,7 +14,19 @@ def theScalaVersion = "3.7.0"
 //java 8 toolchain (TODO: bring it back? maybe we can leave java 8 in the dust)
 //object Java8 extends JvmWorkerModule {
 //  override def jvmId = "temurin:8.0-442"
-//}
+//} //bagsdb
+
+//todo upstream? ;)
+def codeberg(owner: String, repo: String, tag: Option[String] = None): VersionControl = VersionControl(
+  browsableRepository = Some(s"https://codeberg.org/$owner/$repo"),
+  connection = Some(VersionControlConnection.gitGit("codeberg.org", s"$owner/$repo")),
+  developerConnection = Some(VersionControlConnection.gitSsh(
+    "codeberg.org",
+    s":$owner/$repo.git",
+    username = Some("git")
+  )),
+  tag = tag
+)
 
 trait ToyboxBaseModule extends PublishModule with WithJvmWorker {
   def googleGson = mvn"com.google.code.gson:gson:2.11.0"
@@ -30,7 +41,7 @@ trait ToyboxBaseModule extends PublishModule with WithJvmWorker {
 
   //publishing
   override def publishVersion = "0.0.1"
-  private def vc: VersionControl = VersionControl.github("CrackedPolishedBlackstoneBricksMC", "toybox")
+  private def vc: VersionControl = codeberg("CrackedPolishedBlackstoneBricksMC", "toybox")
   override def pomSettings: T[PomSettings] = PomSettings (
     description = desc + " Part of Toybox.",
     organization = "agency.highlysuspect",
@@ -64,6 +75,11 @@ trait ToyboxModule extends JavaModule with ToyboxBaseModule { outer =>
 
 object `toybox-checksum` extends ToyboxModule {
   override def desc: String = "Utilities for working with checksums and hashes."
+}
+
+object `toybox-download` extends ToyboxModule {
+  override def desc: String = "Utilities for downloading files from the internet."
+  object test extends ToyboxTests {}
 }
 
 object `toybox-string` extends ToyboxModule {
@@ -119,7 +135,7 @@ object northstar extends scalalib.ScalaModule {
   override def mvnDeps = Seq(mvn"com.lihaoyi::mill-libs:$millVersion")
 
   override def moduleDeps = super.moduleDeps ++ Seq(
-    `toybox-manifest-index`
+    `toybox-manifest-index`, `toybox-download`
   )
 
   object test extends ScalaTests with TestModule.Utest {

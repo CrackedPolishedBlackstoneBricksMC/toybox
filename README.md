@@ -30,9 +30,11 @@ Sandboxing. (This is intended to be a Mill library after all.)
 
 ### toybox-checksum
 
-Small utilities for working with `MessageFormat` objects and formatting hashes as hex strings.
+Small utilities for working with `MessageFormat` objects and formatting hashes as hex strings. Might get removed/merged into other stuff, we'll see
 
-Might get removed/merged into other stuff, we'll see
+### toybox-download
+
+Somewhat advanced file downloader, can download to disk or in-memory, supports etag caching, deleting files on error, swappable download backends etc  
 
 ### toybox-gdiff
 
